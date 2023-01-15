@@ -128,19 +128,19 @@ public class HatHandler implements CommandExecutor, Listener {
             
         } // End of if statement.
 
-        if(player.hasPermission("hat." + held.getType().name())){
+        if(player.hasPermission("hat." + held.getType().name())){ // If the player has the permission for the item they wish to put on their head. 
 
-            Map<Enchantment, Integer> enchantments;
+            Map<Enchantment, Integer> enchantments; // Create map for helmet enchantments.
 
-            try{
+            try{ // Enter try, as getting enchantments can produce an exception if the item does not exist.
 
-                enchantments = helmetSlot.getEnchantments();
+                enchantments = helmetSlot.getEnchantments(); // Attempt to set enchantments to the helmet slots enchantments.
 
-            }catch(Exception err){
+            }catch(Exception err){ // If error.
 
-                enchantments = new HashMap<Enchantment, Integer>();
+                enchantments = new HashMap<Enchantment, Integer>(); // Set enchantments to empty hashmap.
 
-            }
+            } // End of try-catch.
 
             if(enchantments.containsKey(Enchantment.BINDING_CURSE)){ // If helmet has curse of binding.
 
@@ -179,6 +179,6 @@ public class HatHandler implements CommandExecutor, Listener {
         
         return false; // Invalid case.
         
-    }
+    } // End of function.
 
-}
+} // End of class.
