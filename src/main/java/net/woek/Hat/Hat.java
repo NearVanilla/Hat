@@ -1,5 +1,10 @@
 package net.woek.Hat;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -8,11 +13,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class Hat extends JavaPlugin{
 
@@ -27,11 +27,12 @@ public class Hat extends JavaPlugin{
         String stacksize = (String) messages.get("stack-size");
         String nopermission = (String) messages.get("no-permission");
         String console = (String) messages.get("console");
+        String curse = (String) messages.get("curse");
 
         //TODO: Make sure this works
         registerPermissions();
 
-        HatHandler handler = new HatHandler(this,enabled,set,stacksize,nopermission,console);
+        HatHandler handler = new HatHandler(this, enabled, set, stacksize, nopermission, console, curse);
 
         this.getCommand("hat").setExecutor(handler);
         //if(config.getBoolean("manual_hat_equip.enabled")){
