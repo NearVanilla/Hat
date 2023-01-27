@@ -119,66 +119,48 @@ public class HatHandler implements CommandExecutor, Listener {
     //Returns false otherwise
     private boolean checkValidHat(Player player, ItemStack held){
 
-        PlayerInventory inv = player.getInventory(); // Get inventory of player.
-        ItemStack helmetSlot = inv.getHelmet(); // Get helmet slot of player.
+        PlayerInventory inv = player.getInventory();
+        ItemStack helmetSlot = inv.getHelmet();
         
-        if(held.getType() == Material.AIR){ // If the item the player is holding is air.
-
+        if(held.getType() == Material.AIR){
             return false; // Invalid Case.
-            
-        } // End of if statement.
+        }
 
-        if(player.hasPermission("hat." + held.getType().name())){ // If the player has the permission for the item they wish to put on their head. 
+        if(player.hasPermission("hat." + held.getType().name())){
 
-            Map<Enchantment, Integer> enchantments; // Create map for helmet enchantments.
+            if(player.hasPermission("hat.curse")){
 
-            try{ // Enter try, as getting enchantments can produce an exception if the item does not exist.
+                Map<Enchantment, Integer> enchantments;
+                try{
+                    enchantments = helmetSlot.getEnchantments();
+                }catch(Exception err){
+                    enchantments = new HashMap<Enchantment, Integer>();
+                }
 
-                enchantments = helmetSlot.getEnchantments(); // Attempt to set enchantments to the helmet slots enchantments.
+                if(enchantments.containsKey(Enchantment.BINDING_CURSE)){
+                    if(messagesEnabled){
+                        player.sendMessage(curseOfBindingMessage);
+                    }
+                    return false;
+                }
 
-            }catch(Exception err){ // If error.
+            }
 
-                enchantments = new HashMap<Enchantment, Integer>(); // Set enchantments to empty hashmap.
+            if(held.getAmount() == 1){
+                return true;
+            }else{
+                if(messagesEnabled){
+                    player.sendMessage(stackSizeMessage);
+                }
+            }
 
-            } // End of try-catch.
+        }else{
 
-            if(enchantments.containsKey(Enchantment.BINDING_CURSE)){ // If helmet has curse of binding.
+            if(messagesEnabled){
+                player.sendMessage(noPermissionMessage);
+            }
 
-                if(messagesEnabled){ // If messages are enabled.
-
-                    player.sendMessage(curseOfBindingMessage); // Send curse error message.
-                    return false; // Invalid case.
-
-                } // End of if statement.
-
-            } // End of if statement.
-
-            if(held.getAmount() == 1){ // If amount of item player is holding is 1.
-
-                return true; // Valid case.
-                
-            }else{ // In any other case.
-
-                if(messagesEnabled){ // If messages enabled.
-
-                    player.sendMessage(stackSizeMessage); // Send stack size error message.
-
-                } // End of if statement.
-
-            } // End of if statement.
-            
-        }else{ // In any other case.
-
-            if(messagesEnabled){ // If messages are enabled.
-
-                player.sendMessage(noPermissionMessage); // Send permission error message.
-
-            } // End of if statement.
-
-        } // End of if statement.
-        
-        return false; // Invalid case.
-        
-    } // End of function.
-
-} // End of class.
+        }
+        return false;
+    }
+}

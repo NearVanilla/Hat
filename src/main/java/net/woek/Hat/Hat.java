@@ -98,6 +98,7 @@ public class Hat extends JavaPlugin{
     }
 
     private void registerPermissions(){
+
         Permission basePerm = new Permission("hat.*", PermissionDefault.OP);
         Bukkit.getPluginManager().addPermission(basePerm);
 
@@ -108,6 +109,10 @@ public class Hat extends JavaPlugin{
         Permission itemPerm = new Permission("hat.items", PermissionDefault.FALSE); //^^
         itemPerm.addParent(basePerm, true);
         Bukkit.getPluginManager().addPermission(itemPerm);
+
+        Permission cursePerm = new Permission("hat.curse", PermissionDefault.TRUE);
+        cursePerm.addParent(basePerm, true);
+        Bukkit.getPluginManager().addPermission(cursePerm);
 
         Material[] materials = Material.values();
 
