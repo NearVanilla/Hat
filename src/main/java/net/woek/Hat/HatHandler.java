@@ -1,11 +1,14 @@
 package net.woek.Hat;
 //TODO: Change package name to com.sigong.Hat
 
+import java.util.HashMap;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,19 +26,21 @@ public class HatHandler implements CommandExecutor, Listener {
     private final String stackSizeMessage;
     private final String noPermissionMessage;
     private final String consoleMessage;
+    private final String curseOfBindingMessage;
 
     private final Hat instance;
 
     //Constructor, Grabs messages gets messages from config file
-    public HatHandler(Hat instance, boolean enabled, String set, String stacksize, String nopermission, String console){
+    public HatHandler(Hat instance, boolean enabled, String set, String stacksize, String nopermission, String console, String curseMessage){
+
         this.instance = instance;
-
         messagesEnabled = enabled;
-
         setMessage = ChatColor.translateAlternateColorCodes('&',set);
         stackSizeMessage = ChatColor.translateAlternateColorCodes('&',stacksize);
         noPermissionMessage = ChatColor.translateAlternateColorCodes('&',nopermission);
         consoleMessage = ChatColor.translateAlternateColorCodes('&',console);
+        curseOfBindingMessage = ChatColor.translateAlternateColorCodes('&', curseMessage);
+
     }
 
     @Override
@@ -110,26 +115,51 @@ public class HatHandler implements CommandExecutor, Listener {
     }
 
     //Checks hat conditions (permission and itemstack) for both the command and manual placement
-    //Returns true if the hat is valid (1 item) and the player has permission to wear it
+    //Returns true if the hat is valid (1 item), the player has permission to wear it and the players helmet slot does not have the curse of binding enchantment on it.
     //Returns false otherwise
     private boolean checkValidHat(Player player, ItemStack held){
+
         PlayerInventory inv = player.getInventory();
-        ItemStack helm = inv.getHelmet();
-//        if(player.isOp() || //If player is op, they get all the hats
-//                player.hasPermission("hat." + held.getType().name()) || //If player has the specific permission, or if they have hat.* and the specific permission isn't false
-//                (!player.isPermissionSet("hat." + held.getType().name()) && //If the specific permission isn't set, that means it isn't false
-//                        //If it were true, then the second line would have been true, if it is set now it must be false
-//                        //If it isn't set, and player has hat.blocks or hat.items and the item is a block or item, then this is true.
-//                        ((player.hasPermission("hat.blocks") && held.getType().isBlock()) || (player.hasPermission("hat.items") && !held.getType().isBlock())))){
-        if(player.hasPermission("hat." + held.getType().name()) || held.getType() == Material.AIR){
-            //checks item
-            if(held.getAmount() == 1 || held.getType() == Material.AIR){ //The player is holding nothing or one thing
-                return true; //return that the given item is a valid hat for this player
-            }else{ //The stack size is greater than 1
-                if(messagesEnabled){player.sendMessage(stackSizeMessage);}
+        ItemStack helmetSlot = inv.getHelmet();
+        
+        if(held.getType() == Material.AIR){
+            return false; // Invalid Case.
+        }
+
+        if(player.hasPermission("hat." + held.getType().name())){
+
+            if(player.hasPermission("hat.curse")){
+
+                Map<Enchantment, Integer> enchantments;
+                try{
+                    enchantments = helmetSlot.getEnchantments();
+                }catch(Exception err){
+                    enchantments = new HashMap<Enchantment, Integer>();
+                }
+
+                if(enchantments.containsKey(Enchantment.BINDING_CURSE)){
+                    if(messagesEnabled){
+                        player.sendMessage(curseOfBindingMessage);
+                    }
+                    return false;
+                }
+
             }
-        }else{ //The player does not have permission to use this hat
-            if(messagesEnabled){player.sendMessage(noPermissionMessage);}
+
+            if(held.getAmount() == 1){
+                return true;
+            }else{
+                if(messagesEnabled){
+                    player.sendMessage(stackSizeMessage);
+                }
+            }
+
+        }else{
+
+            if(messagesEnabled){
+                player.sendMessage(noPermissionMessage);
+            }
+
         }
         return false;
     }
